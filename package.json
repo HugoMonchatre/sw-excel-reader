@@ -1,11 +1,5 @@
 {
   "name": "excel-reader-sw",
   "version": "1.0.0",
-  "description": "Excel reader with Summoners War monster lookup",
-  "engines": {
-    "node": ">=18.x"
-  },
-  "scripts": {
-    "build": "mkdir -p dist && cp -r index.html css js dist/"
-  }
+  "description": "Excel reader with Summoners War monster lookup"
 }
