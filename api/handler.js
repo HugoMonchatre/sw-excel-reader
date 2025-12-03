@@ -9,9 +9,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Servir les fichiers statiques
-app.use(express.static(path.join(__dirname, '..')));
-
 // Charger le mapping des noms
 const mappingPath = path.join(__dirname, '../monster_mapping.json');
 console.log(`📂 Cherche mapping à: ${mappingPath}`);
