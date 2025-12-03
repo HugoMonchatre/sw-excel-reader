@@ -2,16 +2,10 @@
   "name": "excel-reader-sw",
   "version": "1.0.0",
   "description": "Excel reader with Summoners War monster lookup",
-  "main": "server.cjs",
   "engines": {
-    "node": ">=20.x"
+    "node": ">=18.x"
   },
   "scripts": {
-    "start": "node api/handler.js",
-    "dev": "node api/handler.js"
-  },
-  "dependencies": {
-    "express": "^4.18.2",
-    "cors": "^2.8.5"
+    "build": "mkdir -p dist && cp -r index.html css js dist/"
   }
 }
