@@ -316,5 +316,8 @@ app.get('/search/:query', async (req, res) => {
     });
 });
 
-// Export pour Vercel serverless
-module.exports = app;
+// Export pour Vercel serverless - il faut exporter une fonction handler
+module.exports = (req, res) => {
+    // Passer la requête à Express
+    return app(req, res);
+};
