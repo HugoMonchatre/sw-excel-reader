@@ -57,9 +57,23 @@ module.exports = async function handler(req, res) {
         const jsonData = await response.json();
 
         if (jsonData.results && jsonData.results.length > 0) {
-            const monster = jsonData.results.find(m =>
-                m.name.toLowerCase() === name.toLowerCase()
-            ) || jsonData.results[0];
+            // Vérifier si c'est un monstre 2A
+            const is2A = name.toLowerCase().includes('2a');
+
+            let monster;
+            if (is2A) {
+                // Pour les 2A, chercher avec awaken_level === 2
+                monster = jsonData.results.find(m =>
+                    m.name.toLowerCase() === translatedName.toLowerCase() && m.awaken_level === 2
+                );
+            }
+
+            // Sinon chercher une correspondance normale
+            if (!monster) {
+                monster = jsonData.results.find(m =>
+                    m.name.toLowerCase() === translatedName.toLowerCase()
+                ) || jsonData.results[0];
+            }
 
             const result = {
                 found: true,
