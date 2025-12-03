@@ -2,7 +2,6 @@
   "name": "excel-reader-sw",
   "version": "1.0.0",
   "description": "Excel reader with Summoners War monster lookup",
-  "type": "module",
   "main": "server.js",
   "engines": {
     "node": ">=20.x"
