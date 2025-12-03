@@ -164,8 +164,13 @@ async function generateTable(data, sheet = null) {
         let headerContent = `${escapeHtml(trimmedName || 'Col ' + (i + 1))}`;
 
         const monsterImage = imageMap.get(i);
-        if (monsterImage) {
-            headerContent = `<div style="margin-bottom: 8px;"><img style="max-width: 60px; max-height: 60px; border-radius: 4px; border: 1px solid #ddd;" src="${monsterImage}" alt="${escapeHtml(trimmedName)}"/></div><div style="font-weight: 600; font-size: 12px;">${escapeHtml(trimmedName)}</div>`;
+        if (trimmedName && trimmedName.length >= 2) {
+            if (monsterImage) {
+                headerContent = `<div style="margin-bottom: 8px;"><img style="max-width: 60px; max-height: 60px; border-radius: 4px; border: 1px solid #ddd;" src="${monsterImage}" alt="${escapeHtml(trimmedName)}"/></div><div style="font-weight: 600; font-size: 12px;">${escapeHtml(trimmedName)}</div>`;
+            } else {
+                // Image non trouvée - afficher juste le nom avec un indicateur
+                headerContent = `<div style="margin-bottom: 8px; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; background: #f0f0f0; border-radius: 4px; border: 1px solid #ddd; font-size: 24px;">❓</div><div style="font-weight: 600; font-size: 12px; color: #666;">${escapeHtml(trimmedName)}</div>`;
+            }
         }
 
         html += `<th style="text-align: center; vertical-align: top;" ${dataMonster}>${headerContent}</th>`;
