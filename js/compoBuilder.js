@@ -4,7 +4,9 @@
 
 const compoBuilder = {
     monsters: [null, null, null],
-    
+    searchCache: new Map(),
+    searchTimeouts: {},
+
     /**
      * Retourne le HTML du builder
      */
@@ -54,48 +56,86 @@ const compoBuilder = {
     },
     
     /**
-     * Gère la recherche de monstres
+     * Gère la recherche de monstres avec debounce
      */
-    async handleSearch(event) {
+    handleSearch(event) {
         const query = event.target.value.trim();
         const slot = parseInt(event.target.dataset.slot);
         const resultsDiv = document.getElementById(`results-${slot}`);
-        
+
         if (query.length < 1) {
             resultsDiv.classList.remove('show');
             return;
         }
-        
+
+        // Annuler la recherche précédente
+        if (this.searchTimeouts[slot]) {
+            clearTimeout(this.searchTimeouts[slot]);
+        }
+
+        // Afficher un indicateur de chargement
+        resultsDiv.innerHTML = '<div class="search-result-item" style="color: #999;">Recherche...</div>';
+        resultsDiv.classList.add('show');
+
+        // Attendre 300ms avant de lancer la recherche
+        this.searchTimeouts[slot] = setTimeout(() => {
+            this.performSearch(query, slot, resultsDiv);
+        }, 300);
+    },
+
+    /**
+     * Effectue la recherche réelle
+     */
+    async performSearch(query, slot, resultsDiv) {
+        // Vérifier le cache
+        const cacheKey = query.toLowerCase();
+        if (this.searchCache.has(cacheKey)) {
+            this.displaySearchResults(this.searchCache.get(cacheKey), slot, resultsDiv);
+            return;
+        }
+
         try {
             const response = await fetch(`/api/search?query=${encodeURIComponent(query)}`);
             const data = await response.json();
-            
-            if (data.results && data.results.length > 0) {
-                resultsDiv.innerHTML = data.results
-                    .map((m, idx) => {
-                        const dataJson = JSON.stringify({
-                            name: m.name,
-                            image: m.image,
-                            element: m.element,
-                            archetype: m.archetype
-                        });
-                        return `
-                            <div class="search-result-item" data-monster='${dataJson}' onclick="compoBuilder.selectMonsterFromResult(${slot}, this)">
-                                <strong>${escapeHtml(m.name)}</strong> 
-                                <span style="font-size: 12px; color: #999;">
-                                    ${m.element} - ${m.archetype}
-                                    ${m.awaken_level === 2 ? ' (2A)' : ''}
-                                </span>
-                            </div>
-                        `;
-                    }).join('');
-                resultsDiv.classList.add('show');
-            } else {
-                resultsDiv.innerHTML = '<div class="search-result-item" style="color: #999;">Aucun résultat</div>';
-                resultsDiv.classList.add('show');
-            }
+
+            // Mettre en cache
+            this.searchCache.set(cacheKey, data);
+
+
+            this.displaySearchResults(data, slot, resultsDiv);
         } catch (error) {
             console.error('Erreur recherche:', error);
+            resultsDiv.innerHTML = '<div class="search-result-item" style="color: #999;">Erreur de recherche</div>';
+        }
+    },
+
+    /**
+     * Affiche les résultats de recherche
+     */
+    displaySearchResults(data, slot, resultsDiv) {
+        if (data.results && data.results.length > 0) {
+            resultsDiv.innerHTML = data.results
+                .map((m, idx) => {
+                    const dataJson = JSON.stringify({
+                        name: m.name,
+                        image: m.image,
+                        element: m.element,
+                        archetype: m.archetype
+                    });
+                    return `
+                        <div class="search-result-item" data-monster='${dataJson}' onclick="compoBuilder.selectMonsterFromResult(${slot}, this)">
+                            <strong>${escapeHtml(m.name)}</strong>
+                            <span style="font-size: 12px; color: #999;">
+                                ${m.element} - ${m.archetype}
+                                ${m.awaken_level === 2 ? ' (2A)' : ''}
+                            </span>
+                        </div>
+                    `;
+                }).join('');
+            resultsDiv.classList.add('show');
+        } else {
+            resultsDiv.innerHTML = '<div class="search-result-item" style="color: #999;">Aucun résultat</div>';
+            resultsDiv.classList.add('show');
         }
     },
     
