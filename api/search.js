@@ -7,8 +7,7 @@ const nameMapping = {
     "hartmann": "Hertman",
     "judiah": "Judea",
     "spadassin du qilin": "Qilin Swordsman",
-    "ramael": "Ryu",
-    "vigor": "Vigor"
+    "ramael": "Ryu"
 };
 
 function translateMonsterName(name) {
