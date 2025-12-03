@@ -35,7 +35,7 @@ async function fetchMonsterImage(monsterName) {
         return null;
     } catch (error) {
         console.error(`Erreur fetch monstre ${monsterName}:`, error.message);
-        monsterImageCache.set(cleanName, null);
+        monsterImageCache.set(String(monsterName).trim(), null);
         return null;
     }
 }

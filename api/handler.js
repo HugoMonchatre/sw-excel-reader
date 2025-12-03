@@ -115,8 +115,8 @@ async function getMonsterFromAPI(monsterName) {
 }
 
 // Endpoint pour rechercher les infos du monstre
-app.get('/monster/:name', async (req, res) => {
-    const monsterName = decodeURIComponent(req.params.name).trim();
+app.get('/api/monster', async (req, res) => {
+    const monsterName = (req.query.name || '').trim();
     
     // Vérifier le cache d'abord
     if (monsterCache[monsterName.toLowerCase()]) {
@@ -134,8 +134,8 @@ app.get('/monster/:name', async (req, res) => {
 });
 
 // Endpoint pour récupérer juste l'URL de l'image d'un monstre
-app.get('/monster-image/:name', (req, res) => {
-    const monsterName = decodeURIComponent(req.params.name).trim();
+app.get('/api/monster-image', (req, res) => {
+    const monsterName = (req.query.name || '').trim();
     const baseName = monsterName.replace(/\s*\(2a\)\s*/i, '').trim();
     
     // Récupérer depuis l'API swarfarm.com
@@ -160,7 +160,7 @@ app.get('/monster-image/:name', (req, res) => {
     }).on('error', () => res.json({ image: null }));
 });
 
-app.post('/set-available-monsters', (req, res) => {
+app.post('/api/set-available-monsters', (req, res) => {
     availableMonsters = req.body.monsters || [];
     console.log(`📝 Liste des monstres disponibles mise à jour: ${availableMonsters.join(', ')}`);
     res.json({ success: true, count: availableMonsters.length });
@@ -168,8 +168,8 @@ app.post('/set-available-monsters', (req, res) => {
 
 // Endpoint pour chercher des monstres (pour la barre de recherche)
 // Ne retourne que les monstres présents dans availableMonsters
-app.get('/search/:query', async (req, res) => {
-    const query = decodeURIComponent(req.params.query).trim();
+app.get('/api/search', async (req, res) => {
+    const query = (req.query.q || '').trim();
     
     if (query.length < 1) {
         return res.json({ results: [] });
