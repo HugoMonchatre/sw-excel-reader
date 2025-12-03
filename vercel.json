@@ -24,6 +24,18 @@
   ],
   "routes": [
     {
+      "src": "/api/test",
+      "dest": "/api/test.js"
+    },
+    {
+      "src": "/api/monster",
+      "dest": "/api/monster.js"
+    },
+    {
+      "src": "/api/set-available-monsters",
+      "dest": "/api/set-available-monsters.js"
+    },
+    {
       "src": "/css/(.*)",
       "dest": "/css/$1"
     },
@@ -34,10 +46,6 @@
     {
       "src": "/index.html",
       "dest": "/index.html"
-    },
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
     },
     {
       "src": "/(.*)",
