@@ -316,6 +316,11 @@ app.get('/search/:query', async (req, res) => {
     });
 });
 
+// Route par défaut - servir index.html pour SPA
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../index.html'));
+});
+
 // Export pour Vercel serverless - il faut exporter une fonction handler
 module.exports = (req, res) => {
     // Passer la requête à Express
