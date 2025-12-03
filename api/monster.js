@@ -1,5 +1,29 @@
 const cache = new Map();
 
+// Mapping des noms français vers anglais
+const nameMapping = {
+    "galion": "Galleon",
+    "agirus": "Aegir",
+    "hartmann": "Hertman",
+    "judiah": "Judea",
+    "spadassin du qilin": "Qilin Swordsman",
+    "ramael": "Ryu"
+};
+
+function translateMonsterName(name) {
+    const lowerName = name.toLowerCase().trim();
+
+    // Retirer "(2A)" ou "2A" pour la recherche
+    const baseName = lowerName.replace(/\s*\(2a\)\s*/i, '').replace(/\s*2a\s*/i, '').trim();
+
+    // Chercher dans le mapping
+    if (nameMapping[baseName]) {
+        return nameMapping[baseName];
+    }
+
+    return name;
+}
+
 module.exports = async function handler(req, res) {
     const monsterName = req.query.name || '';
 
@@ -12,6 +36,7 @@ module.exports = async function handler(req, res) {
     }
 
     const name = decodeURIComponent(monsterName).trim();
+    const translatedName = translateMonsterName(name);
 
     // Vérifier le cache
     if (cache.has(name.toLowerCase())) {
@@ -19,8 +44,8 @@ module.exports = async function handler(req, res) {
     }
 
     try {
-        // Chercher sur l'API SWARFARM avec fetch natif
-        const url = `https://swarfarm.com/api/v2/monsters/?name=${encodeURIComponent(name)}&limit=10`;
+        // Chercher sur l'API SWARFARM avec le nom traduit
+        const url = `https://swarfarm.com/api/v2/monsters/?name=${encodeURIComponent(translatedName)}&limit=10`;
         const response = await fetch(url);
 
         if (!response.ok) {
