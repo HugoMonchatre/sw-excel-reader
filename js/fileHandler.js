@@ -17,7 +17,7 @@ async function fetchMonsterImage(monsterName) {
             return monsterImageCache.get(cleanName);
         }
 
-        const response = await fetch(`/api/monster/${encodeURIComponent(cleanName)}`);
+        const response = await fetch(`/api/monster?name=${encodeURIComponent(cleanName)}`);
 
         if (!response.ok) {
             monsterImageCache.set(cleanName, null);

@@ -1,11 +1,14 @@
-// Liste globale des monstres disponibles (persiste pendant la durée de vie de la fonction)
 let availableMonsters = [];
 
-module.exports = (req, res) => {
+export default function handler(req, res) {
     // CORS
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'POST');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
+    }
 
     if (req.method === 'POST') {
         availableMonsters = req.body.monsters || [];
@@ -13,4 +16,4 @@ module.exports = (req, res) => {
     }
 
     res.status(405).json({ error: 'Method not allowed' });
-};
+}
