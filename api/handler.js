@@ -13,7 +13,16 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, '..')));
 
 // Charger le mapping des noms
-const monsterMapping = JSON.parse(fs.readFileSync(path.join(__dirname, '../monster_mapping.json'), 'utf8'));
+const mappingPath = path.join(__dirname, '../monster_mapping.json');
+console.log(`📂 Cherche mapping à: ${mappingPath}`);
+
+let monsterMapping = {};
+try {
+  monsterMapping = JSON.parse(fs.readFileSync(mappingPath, 'utf8'));
+  console.log(`✅ Mapping chargé avec succès`);
+} catch (error) {
+  console.error(`⚠️ Impossible de charger le mapping:`, error.message);
+}
 
 // Cache pour les monstres trouvés
 const monsterCache = {};
