@@ -36,6 +36,10 @@
       "dest": "/api/monsters-batch.js"
     },
     {
+      "src": "/api/search",
+      "dest": "/api/search.js"
+    },
+    {
       "src": "/api/set-available-monsters",
       "dest": "/api/set-available-monsters.js"
     },
