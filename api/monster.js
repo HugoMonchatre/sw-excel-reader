@@ -3,12 +3,13 @@ const cache = new Map();
 // Mapping des noms français vers anglais
 const nameMapping = {
     "galion": "Galleon",
-    "agirus": "Aegir",
-    "hartmann": "Hertman",
+    "agirus": "Agirus",
+    "hartmann": "Hartmann",
     "judiah": "Judea",
     "spadassin du qilin": "Qilin Swordsman",
     "ramael": "Ryu",
-    "vigor": "Vigor"
+    "vigor": "Vigor",
+    "eshir": "Eshir"
 };
 
 function translateMonsterName(name) {
