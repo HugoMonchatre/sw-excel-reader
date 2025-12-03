@@ -1,6 +1,6 @@
 const cache = new Map();
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
     const monsterName = req.query.name || '';
 
     // CORS
