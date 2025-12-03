@@ -166,6 +166,37 @@ app.post('/api/set-available-monsters', (req, res) => {
     res.json({ success: true, count: availableMonsters.length });
 });
 
+// Endpoint batch pour récupérer plusieurs monstres en une seule requête
+app.post('/api/monsters-batch', async (req, res) => {
+    const names = req.body.names || [];
+    if (!Array.isArray(names) || names.length === 0) {
+        return res.json({ results: {} });
+    }
+
+    console.log(`📦 Batch request pour ${names.length} monstres`);
+
+    // Traiter tous les monstres en parallèle
+    const results = {};
+    await Promise.all(names.map(async (name) => {
+        const monsterName = String(name).trim();
+        if (!monsterName) return;
+
+        // Vérifier le cache d'abord
+        if (monsterCache[monsterName.toLowerCase()]) {
+            results[monsterName] = monsterCache[monsterName.toLowerCase()];
+            return;
+        }
+
+        // Récupérer depuis l'API
+        const result = await getMonsterFromAPI(monsterName);
+        monsterCache[monsterName.toLowerCase()] = result;
+        results[monsterName] = result;
+    }));
+
+    console.log(`✅ Batch terminé: ${Object.keys(results).length} résultats`);
+    res.json({ results });
+});
+
 // Endpoint pour chercher des monstres (pour la barre de recherche)
 // Ne retourne que les monstres présents dans availableMonsters
 app.get('/api/search', async (req, res) => {

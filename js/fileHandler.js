@@ -5,6 +5,66 @@
 // Cache pour les images des monstres
 const monsterImageCache = new Map();
 
+/**
+ * Charge plusieurs monstres en une seule requête batch
+ */
+async function fetchMonstersBatch(monsterNames) {
+    const validNames = monsterNames
+        .map(n => String(n).trim())
+        .filter(n => n && n.length >= 2 && !/^\d+$/.test(n));
+
+    // Séparer les noms en cache et ceux à charger
+    const cached = {};
+    const toFetch = [];
+
+    validNames.forEach(name => {
+        if (monsterImageCache.has(name)) {
+            cached[name] = monsterImageCache.get(name);
+        } else {
+            toFetch.push(name);
+        }
+    });
+
+    // Si tout est en cache, retourner directement
+    if (toFetch.length === 0) {
+        return cached;
+    }
+
+    try {
+        const response = await fetch('/api/monsters-batch', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ names: toFetch })
+        });
+
+        if (!response.ok) {
+            return cached;
+        }
+
+        const data = await response.json();
+
+        // Mettre en cache les résultats
+        Object.entries(data.results || {}).forEach(([name, result]) => {
+            const image = result.found ? result.image : null;
+            monsterImageCache.set(name, image);
+            cached[name] = image;
+        });
+
+        // Marquer les non-trouvés comme null
+        toFetch.forEach(name => {
+            if (!cached.hasOwnProperty(name)) {
+                monsterImageCache.set(name, null);
+                cached[name] = null;
+            }
+        });
+
+        return cached;
+    } catch (error) {
+        console.error('Erreur fetch batch:', error.message);
+        return cached;
+    }
+}
+
 async function fetchMonsterImage(monsterName) {
     try {
         const cleanName = String(monsterName).trim();
@@ -42,6 +102,7 @@ async function fetchMonsterImage(monsterName) {
 
 /**
  * Génère un tableau HTML à partir des données Excel
+ * Affiche d'abord le tableau sans images, puis charge les images en parallèle
  */
 async function generateTable(data, sheet = null) {
     if (!data || data.length === 0) {
@@ -70,8 +131,28 @@ async function generateTable(data, sheet = null) {
     } else {
         monsterNames = data[3] || [];
     }
-    
+
     let html = '<div class="table-wrapper"><table>';
+
+    // Collecter les noms de monstres valides pour le chargement batch
+    const validMonsters = [];
+    for (let i = 0; i < maxCols; i++) {
+        const monsterName = Array.isArray(monsterNames) ? monsterNames[i] : '';
+        const trimmedName = monsterName ? String(monsterName).trim() : '';
+        if (trimmedName && trimmedName.length >= 2 && !/^\d+$/.test(trimmedName)) {
+            validMonsters.push({ index: i, name: trimmedName });
+        }
+    }
+
+    // Charger toutes les images en une seule requête batch
+    const monsterNamesToFetch = validMonsters.map(m => m.name);
+    const batchResults = await fetchMonstersBatch(monsterNamesToFetch);
+
+    // Créer un map pour accès rapide par index
+    const imageMap = new Map();
+    validMonsters.forEach(m => {
+        imageMap.set(m.index, batchResults[m.name] || null);
+    });
 
     // En-têtes avec images des monstres
     html += '<thead><tr>';
@@ -82,11 +163,9 @@ async function generateTable(data, sheet = null) {
 
         let headerContent = `${escapeHtml(trimmedName || 'Col ' + (i + 1))}`;
 
-        if (trimmedName) {
-            const monsterImage = await fetchMonsterImage(trimmedName);
-            if (monsterImage) {
-                headerContent = `<div style="margin-bottom: 8px;"><img style="max-width: 60px; max-height: 60px; border-radius: 4px; border: 1px solid #ddd;" src="${monsterImage}" alt="${escapeHtml(trimmedName)}"/></div><div style="font-weight: 600; font-size: 12px;">${escapeHtml(trimmedName)}</div>`;
-            }
+        const monsterImage = imageMap.get(i);
+        if (monsterImage) {
+            headerContent = `<div style="margin-bottom: 8px;"><img style="max-width: 60px; max-height: 60px; border-radius: 4px; border: 1px solid #ddd;" src="${monsterImage}" alt="${escapeHtml(trimmedName)}"/></div><div style="font-weight: 600; font-size: 12px;">${escapeHtml(trimmedName)}</div>`;
         }
 
         html += `<th style="text-align: center; vertical-align: top;" ${dataMonster}>${headerContent}</th>`;
@@ -97,7 +176,7 @@ async function generateTable(data, sheet = null) {
     html += '<tbody>';
     for (let i = 4; i < data.length; i++) {
         const row = data[i];
-        
+
         let isEmptyRow = true;
         if (Array.isArray(row)) {
             for (let j = 0; j < maxCols; j++) {
@@ -107,7 +186,7 @@ async function generateTable(data, sheet = null) {
                 }
             }
         }
-        
+
         if (!isEmptyRow) {
             html += '<tr>';
             for (let j = 0; j < maxCols; j++) {

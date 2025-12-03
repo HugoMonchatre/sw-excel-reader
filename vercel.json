@@ -8,6 +8,7 @@
   ],
   "routes": [
     { "src": "/api/monster", "dest": "/api/handler.js" },
+    { "src": "/api/monsters-batch", "dest": "/api/handler.js" },
     { "src": "/api/set-available-monsters", "dest": "/api/handler.js" },
     { "src": "/api/search/(.*)", "dest": "/api/handler.js" },
     { "src": "/css/(.*)", "dest": "/css/$1" },
