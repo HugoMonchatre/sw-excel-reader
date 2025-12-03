@@ -1,7 +1,5 @@
 {
   "version": 2,
-  "buildCommand": "npm run build",
-  "outputDirectory": ".",
   "routes": [
     { "src": "/api/(.*)", "dest": "/api" },
     { "src": "/css/(.*)", "dest": "/css/$1" },
