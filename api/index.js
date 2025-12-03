@@ -5,14 +5,12 @@ const fs = require('fs');
 const path = require('path');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
 app.use(cors());
-app.use(express.static(__dirname));
 app.use(express.json());
 
 // Charger le mapping des noms
-const monsterMapping = JSON.parse(fs.readFileSync(path.join(__dirname, 'monster_mapping.json'), 'utf8'));
+const monsterMapping = JSON.parse(fs.readFileSync(path.join(__dirname, '../monster_mapping.json'), 'utf8'));
 
 // Cache pour les monstres trouvés
 const monsterCache = {};
@@ -107,116 +105,8 @@ async function getMonsterFromAPI(monsterName) {
     });
 }
 
-// Base de données locale des monstres (nom -> { color, emoji })
-const monstersDB = {
-  'Zaiross': { color: '#FF6B6B', emoji: '🐉' },
-  'Anavel': { color: '#4ECDC4', emoji: '👸' },
-  'Ritsu': { color: '#95E1D3', emoji: '🧙' },
-  'Jessica': { color: '#F38181', emoji: '💃' },
-  'Eludia': { color: '#AA96DA', emoji: '✨' },
-  'Narsha': { color: '#FCBAD3', emoji: '🌙' },
-  'Viva': { color: '#A8E6CF', emoji: '🎭' },
-  'Talisman': { color: '#FFD3B6', emoji: '📿' },
-  'Vanessa': { color: '#FFAAA5', emoji: '👑' },
-  'Galion': { color: '#FF8B94', emoji: '⚔️' },
-  'Clara': { color: '#B4A7D6', emoji: '💎' },
-  'Salah': { color: '#73A1BD', emoji: '🗡️' },
-  'Akroma': { color: '#5D737E', emoji: '🛡️' },
-  'Herteit': { color: '#C06C84', emoji: '🔥' },
-  'Elena': { color: '#6C5B7B', emoji: '🌟' },
-  'Zerath': { color: '#355C7D', emoji: '⚡' },
-  'Gojo Light': { color: '#2A9D8F', emoji: '🔮' },
-  'Craka': { color: '#E76F51', emoji: '😈' },
-  'Celia': { color: '#F4A261', emoji: '🌸' },
-  'Lucifer': { color: '#E9C46A', emoji: '👿' },
-  'Nephthys': { color: '#2A9D8F', emoji: '🪶' },
-  'Gurkha': { color: '#264653', emoji: '🗡️' },
-  'Giana': { color: '#E76F51', emoji: '🎵' },
-  'Ian': { color: '#F4A261', emoji: '⚔️' },
-  'Grogen': { color: '#E9C46A', emoji: '🍺' },
-  'Ariana': { color: '#2A9D8F', emoji: '💒' },
-  'Wolyung': { color: '#264653', emoji: '🐉' },
-  'Nigong': { color: '#E76F51', emoji: '🌊' },
-  'Velaksa': { color: '#F4A261', emoji: '🧛' },
-  'Benedict': { color: '#E9C46A', emoji: '🤖' },
-  'Leona': { color: '#2A9D8F', emoji: '🦁' },
-  'Inosuke Light': { color: '#264653', emoji: '😤' },
-  'Miruel': { color: '#E76F51', emoji: '🦄' },
-  'Graciah': { color: '#F4A261', emoji: '⚖️' },
-  'Reine': { color: '#E9C46A', emoji: '👑' },
-  'Valantis': { color: '#2A9D8F', emoji: '💪' },
-  'Shan': { color: '#264653', emoji: '🌪️' },
-  'SZL': { color: '#E76F51', emoji: '🐉' },
-  'Jin Dark': { color: '#F4A261', emoji: '👹' },
-  'Shazam': { color: '#E9C46A', emoji: '⚡' },
-  'Audrey': { color: '#2A9D8F', emoji: '🎀' },
-  'Giselle': { color: '#264653', emoji: '❄️' },
-  'Belzebuth': { color: '#E76F51', emoji: '😈' },
-  'Woonsa': { color: '#F4A261', emoji: '🌪️' },
-  'Pater': { color: '#E9C46A', emoji: '👴' },
-  'Veronica': { color: '#2A9D8F', emoji: '💕' },
-  'Eleanor': { color: '#264653', emoji: '👸' },
-  'Han': { color: '#E76F51', emoji: '🏃' },
-  'Woosa': { color: '#F4A261', emoji: '🌊' },
-  'Zenitsu Dark': { color: '#E9C46A', emoji: '⚡' },
-  'Phœnix Dark': { color: '#2A9D8F', emoji: '🔥' },
-  'N1X': { color: '#264653', emoji: '🤖' },
-  'Sylvia': { color: '#E76F51', emoji: '🧙‍♀️' },
-  'Nina Light': { color: '#F4A261', emoji: '👧' },
-  'Geldnir': { color: '#E9C46A', emoji: '🪨' },
-  'Berghild': { color: '#2A9D8F', emoji: '👱' },
-  'Trinité': { color: '#264653', emoji: '👼' },
-  'Seimei': { color: '#E76F51', emoji: '🌸' },
-  'Douman': { color: '#F4A261', emoji: '😈' },
-  'Alexandra': { color: '#E9C46A', emoji: '👰' },
-  'Mannanan': { color: '#2A9D8F', emoji: '⚔️' },
-  'Pudding Light': { color: '#264653', emoji: '🍮' },
-  'Kiki': { color: '#E76F51', emoji: '🐈' },
-  'Lydia': { color: '#F4A261', emoji: '🎬' },
-  'Yuji Dark': { color: '#E9C46A', emoji: '💀' },
-  'Nicki': { color: '#2A9D8F', emoji: '💃' },
-  'Hilda': { color: '#264653', emoji: '⛸️' },
-  'Lora': { color: '#E76F51', emoji: '🐉' },
-  'Cadiz': { color: '#F4A261', emoji: '🌊' },
-  'Hylius': { color: '#E9C46A', emoji: '🔱' },
-  'Maxi': { color: '#2A9D8F', emoji: '💪' },
-  'Pontos': { color: '#264653', emoji: '👹' },
-  'Laima': { color: '#E76F51', emoji: '😊' },
-  'Nobara Light': { color: '#F4A261', emoji: '🎀' },
-  'Craig': { color: '#E9C46A', emoji: '🔨' },
-  'Groa': { color: '#2A9D8F', emoji: '🧙' },
-  'Elenoa': { color: '#264653', emoji: '🦄' },
-  'Yeonhong': { color: '#E76F51', emoji: '🌺' },
-  'Sigrid': { color: '#F4A261', emoji: '❄️' },
-  'Pudding Dark': { color: '#E9C46A', emoji: '🍮' },
-  'Xiana': { color: '#2A9D8F', emoji: '🐺' },
-  'Thebae': { color: '#264653', emoji: '🧟' },
-  'S3lver': { color: '#E76F51', emoji: '⚔️' },
-  'Hyllus': { color: '#F4A261', emoji: '🕷️' },
-  'Euldong': { color: '#E9C46A', emoji: '🦾' },
-  'Lars': { color: '#2A9D8F', emoji: '🐺' },
-  'Nezuko Dark': { color: '#264653', emoji: '👹' },
-  'Kovarcy': { color: '#E76F51', emoji: '🧬' },
-  'Fermion': { color: '#F4A261', emoji: '⚛️' },
-  'Gisèle': { color: '#E9C46A', emoji: '💎' },
-  'Destiny': { color: '#2A9D8F', emoji: '✨' },
-  'Devraja': { color: '#264653', emoji: '🐉' }
-};
-
-// Générer une image SVG placeholder avec emoji
-function generatePlaceholderImage(monsterName, data) {
-    const emoji = data.emoji || '?';
-    const color = data.color;
-    const svg = `<svg width="80" height="80" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80">
-        <rect width="80" height="80" fill="${color}" rx="6"/>
-        <text x="40" y="45" font-size="40" text-anchor="middle" dominant-baseline="middle" fill="white" font-family="Arial, sans-serif">${emoji}</text>
-    </svg>`;
-    
-    return `data:image/svg+xml,${encodeURIComponent(svg)}`;
-}
-
 // Endpoint pour rechercher les infos du monstre
-app.get('/api/monster/:name', async (req, res) => {
+app.get('/monster/:name', async (req, res) => {
     const monsterName = decodeURIComponent(req.params.name).trim();
     
     // Vérifier le cache d'abord
@@ -234,36 +124,8 @@ app.get('/api/monster/:name', async (req, res) => {
     res.json(result);
 });
 
-    /**
-     * Récupère l'image d'un monstre via son nom
-     */
-    async function fetchMonsterImageViaAPI(monsterName) {
-        return new Promise((resolve) => {
-            const baseName = monsterName.replace(/\s*\(2a\)\s*/i, '').trim();
-            const url = `https://swarfarm.com/api/v2/monsters/?name=${encodeURIComponent(baseName)}&limit=5`;
-            
-            https.get(url, (res) => {
-                let data = '';
-                res.on('data', (chunk) => { data += chunk; });
-                res.on('end', () => {
-                    try {
-                        const jsonData = JSON.parse(data);
-                        if (jsonData.results && jsonData.results.length > 0) {
-                            const monster = jsonData.results[0];
-                            resolve(`https://swarfarm.com/static/herders/images/monsters/${monster.image_filename}`);
-                        } else {
-                            resolve(null);
-                        }
-                    } catch (error) {
-                        resolve(null);
-                    }
-                });
-            }).on('error', () => resolve(null));
-        });
-    }
-
 // Endpoint pour récupérer juste l'URL de l'image d'un monstre
-app.get('/api/monster-image/:name', (req, res) => {
+app.get('/monster-image/:name', (req, res) => {
     const monsterName = decodeURIComponent(req.params.name).trim();
     const baseName = monsterName.replace(/\s*\(2a\)\s*/i, '').trim();
     
@@ -289,7 +151,7 @@ app.get('/api/monster-image/:name', (req, res) => {
     }).on('error', () => res.json({ image: null }));
 });
 
-app.post('/api/set-available-monsters', (req, res) => {
+app.post('/set-available-monsters', (req, res) => {
     availableMonsters = req.body.monsters || [];
     console.log(`📝 Liste des monstres disponibles mise à jour: ${availableMonsters.join(', ')}`);
     res.json({ success: true, count: availableMonsters.length });
@@ -297,7 +159,7 @@ app.post('/api/set-available-monsters', (req, res) => {
 
 // Endpoint pour chercher des monstres (pour la barre de recherche)
 // Ne retourne que les monstres présents dans availableMonsters
-app.get('/api/search/:query', async (req, res) => {
+app.get('/search/:query', async (req, res) => {
     const query = decodeURIComponent(req.params.query).trim();
     
     if (query.length < 1) {
@@ -442,9 +304,4 @@ app.get('/api/search/:query', async (req, res) => {
     });
 });
 
-app.listen(PORT, () => {
-    console.log(`✅ Serveur démarré sur http://localhost:${PORT}`);
-    console.log(`📂 Fichiers servis depuis: ${__dirname}`);
-    console.log(`🌐 Récupération des images depuis swarfarm.com API`);
-});
-// Force rebuild
+module.exports = app;
