@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "Excel reader with Summoners War monster lookup",
   "main": "server.js",
-  "type": "module",
   "engines": {
     "node": ">=20.x"
   },
