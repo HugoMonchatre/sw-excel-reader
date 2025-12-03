@@ -304,5 +304,5 @@ app.get('/search/:query', async (req, res) => {
     });
 });
 
-// Export pour Vercel
+// Export pour Vercel serverless
 module.exports = app;
