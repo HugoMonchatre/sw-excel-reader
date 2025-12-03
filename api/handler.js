@@ -9,6 +9,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Servir les fichiers statiques
+app.use(express.static(path.join(__dirname, '..')));
+
 // Charger le mapping des noms
 const monsterMapping = JSON.parse(fs.readFileSync(path.join(__dirname, '../monster_mapping.json'), 'utf8'));
 
