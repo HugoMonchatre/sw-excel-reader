@@ -32,6 +32,10 @@
       "dest": "/api/monster.js"
     },
     {
+      "src": "/api/monsters-batch",
+      "dest": "/api/monsters-batch.js"
+    },
+    {
       "src": "/api/set-available-monsters",
       "dest": "/api/set-available-monsters.js"
     },
