@@ -447,3 +447,4 @@ app.listen(PORT, () => {
     console.log(`📂 Fichiers servis depuis: ${__dirname}`);
     console.log(`🌐 Récupération des images depuis swarfarm.com API`);
 });
+// Force rebuild
