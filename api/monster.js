@@ -1,5 +1,3 @@
-import https from 'https';
-
 const cache = new Map();
 
 export default async function handler(req, res) {
@@ -20,53 +18,42 @@ export default async function handler(req, res) {
         return res.json(cache.get(name.toLowerCase()));
     }
 
-    // Chercher sur l'API SWARFARM
-    const url = `https://swarfarm.com/api/v2/monsters/?name=${encodeURIComponent(name)}&limit=10`;
+    try {
+        // Chercher sur l'API SWARFARM avec fetch natif
+        const url = `https://swarfarm.com/api/v2/monsters/?name=${encodeURIComponent(name)}&limit=10`;
+        const response = await fetch(url);
 
-    return new Promise((resolve) => {
-        https.get(url, (apiRes) => {
-            let data = '';
+        if (!response.ok) {
+            const notFound = { found: false, name };
+            cache.set(name.toLowerCase(), notFound);
+            return res.json(notFound);
+        }
 
-            apiRes.on('data', (chunk) => {
-                data += chunk;
-            });
+        const jsonData = await response.json();
 
-            apiRes.on('end', () => {
-                try {
-                    const jsonData = JSON.parse(data);
+        if (jsonData.results && jsonData.results.length > 0) {
+            const monster = jsonData.results.find(m =>
+                m.name.toLowerCase() === name.toLowerCase()
+            ) || jsonData.results[0];
 
-                    if (jsonData.results && jsonData.results.length > 0) {
-                        const monster = jsonData.results.find(m =>
-                            m.name.toLowerCase() === name.toLowerCase()
-                        ) || jsonData.results[0];
+            const result = {
+                found: true,
+                name: monster.name,
+                image: `https://swarfarm.com/static/herders/images/monsters/${monster.image_filename}`,
+                element: monster.element,
+                archetype: monster.archetype,
+                awaken_level: monster.awaken_level
+            };
 
-                        const result = {
-                            found: true,
-                            name: monster.name,
-                            image: `https://swarfarm.com/static/herders/images/monsters/${monster.image_filename}`,
-                            element: monster.element,
-                            archetype: monster.archetype,
-                            awaken_level: monster.awaken_level
-                        };
+            cache.set(name.toLowerCase(), result);
+            return res.json(result);
+        }
 
-                        cache.set(name.toLowerCase(), result);
-                        res.json(result);
-                        resolve();
-                        return;
-                    }
-
-                    const notFound = { found: false, name };
-                    cache.set(name.toLowerCase(), notFound);
-                    res.json(notFound);
-                    resolve();
-                } catch (error) {
-                    res.json({ found: false, name });
-                    resolve();
-                }
-            });
-        }).on('error', () => {
-            res.json({ found: false, name });
-            resolve();
-        });
-    });
+        const notFound = { found: false, name };
+        cache.set(name.toLowerCase(), notFound);
+        return res.json(notFound);
+    } catch (error) {
+        console.error('Error fetching monster:', error);
+        return res.json({ found: false, name });
+    }
 }
