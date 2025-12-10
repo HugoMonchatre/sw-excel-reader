@@ -4,9 +4,22 @@
 
 /**
  * Normalise un nom de monstre pour la comparaison
+ * Retire les variantes de 2A pour permettre la comparaison
  */
 function normalizeMonsterName(name) {
-    return name ? name.trim().toLowerCase() : null;
+    if (!name) return null;
+
+    // Convertir en minuscules et trim
+    let normalized = name.trim().toLowerCase();
+
+    // Retirer toutes les variantes de 2A
+    // "(2a)", "2a", " (2a) ", etc.
+    normalized = normalized
+        .replace(/\s*\(2a\)\s*/gi, '')  // Retire (2A) avec ou sans espaces
+        .replace(/\s+2a\s*/gi, '')       // Retire 2A précédé d'espaces
+        .trim();
+
+    return normalized;
 }
 
 /**
